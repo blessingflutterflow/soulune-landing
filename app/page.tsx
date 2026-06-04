@@ -6,8 +6,8 @@ export default function Home() {
   return (
     <>
       <HeroSection distortion={1.2} speed={0.8} />
-      <StackPilot />
       <AnimatedCardStack />
+      <StackPilot />
     </>
   );
 }

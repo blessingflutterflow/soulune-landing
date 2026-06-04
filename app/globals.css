@@ -24,3 +24,82 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ── StackPilot component animations ── */
+@keyframes word-appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(40);
+    opacity: 0;
+  }
+}
+
+@keyframes line-draw {
+  from { opacity: 0; }
+  to   { opacity: 0.12; }
+}
+
+@keyframes dot-appear {
+  from { opacity: 0; transform: scale(0); }
+  to   { opacity: 0.6; transform: scale(1); }
+}
+
+@keyframes corner-appear {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+  50%       { transform: translateY(-10px) rotate(180deg); opacity: 0.6; }
+}
+
+.word {
+  display: inline-block;
+  opacity: 0;
+  margin-right: 0.25em;
+}
+
+.grid-line {
+  stroke: rgba(200, 180, 160, 0.12);
+  stroke-width: 0.5;
+  opacity: 0;
+  animation: line-draw 1s ease-out forwards;
+}
+
+.detail-dot {
+  fill: rgba(200, 180, 160, 0.6);
+  opacity: 0;
+  animation: dot-appear 0.5s ease-out forwards;
+}
+
+.corner-element {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  opacity: 0;
+  animation: corner-appear 0.8s ease-out forwards;
+}
+
+.floating-element {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(200, 180, 160, 0.4);
+  border-radius: 50%;
+  animation: float 4s ease-in-out infinite paused;
+}

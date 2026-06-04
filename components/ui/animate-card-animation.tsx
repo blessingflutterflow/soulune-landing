@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface Card {
@@ -128,34 +128,53 @@ export default function AnimatedCardStack() {
   const [cards, setCards] = useState(initialCards)
   const [isAnimating, setIsAnimating] = useState(false)
   const [nextId, setNextId] = useState(4)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const nextIdRef = useRef(4)
 
-  const handleAnimate = () => {
-    setIsAnimating(true)
+  const cycleCard = useCallback(() => {
+    setCards((prev) => {
+      const nextContentType = ((prev[2].contentType % 3) + 1) as 1 | 2 | 3
+      const id = nextIdRef.current++
+      return [...prev.slice(1), { id, contentType: nextContentType }]
+    })
+  }, [])
 
-    const nextContentType = ((cards[2].contentType % 3) + 1) as 1 | 2 | 3
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
 
-    setCards([...cards.slice(1), { id: nextId, contentType: nextContentType }])
-    setNextId((prev) => prev + 1)
-    setIsAnimating(false)
-  }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // Start cycling every 1.5s when visible
+          intervalRef.current = setInterval(cycleCard, 1500)
+        } else {
+          // Stop when scrolled out of view
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current)
+            intervalRef.current = null
+          }
+        }
+      },
+      { threshold: 0.4 }
+    )
+
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [cycleCard])
 
   return (
-    <div className="flex w-full flex-col items-center justify-center pt-2">
+    <div ref={containerRef} className="flex w-full flex-col items-center justify-center pt-2">
       <div className="relative h-[380px] w-full overflow-hidden sm:w-[644px]">
         <AnimatePresence initial={false}>
           {cards.slice(0, 3).map((card, index) => (
             <AnimatedCard key={card.id} card={card} index={index} isAnimating={isAnimating} />
           ))}
         </AnimatePresence>
-      </div>
-
-      <div className="relative z-10 -mt-px flex w-full items-center justify-center border-t border-border py-4">
-        <button
-          onClick={handleAnimate}
-          className="flex h-9 cursor-pointer select-none items-center justify-center gap-1 overflow-hidden rounded-lg border border-border bg-background px-3 font-medium text-secondary-foreground transition-all hover:bg-secondary/80 active:scale-[0.98]"
-        >
-          Animate
-        </button>
       </div>
     </div>
   )

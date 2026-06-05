@@ -17,10 +17,12 @@ const colors = {
 
 export function Component() {
   const gradientRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Animate words
-    const words = document.querySelectorAll<HTMLElement>(".word");
+    // Animate words — scoped to this component only
+    const root = containerRef.current ?? document;
+    const words = root.querySelectorAll<HTMLElement>(".word");
     words.forEach((word) => {
       const delay = parseInt(word.getAttribute("data-delay") || "0", 10);
       setTimeout(() => {
@@ -76,7 +78,7 @@ export function Component() {
     function onScroll() {
       if (!scrolled) {
         scrolled = true;
-        document.querySelectorAll<HTMLElement>(".floating-element").forEach((el, index) => {
+        root.querySelectorAll<HTMLElement>(".floating-element").forEach((el, index) => {
           setTimeout(() => {
             el.style.animationPlayState = "running";
           }, index * 200);
@@ -94,7 +96,7 @@ export function Component() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1d18] via-black to-[#2a2e26] text-[#e6e1d7] font-primary overflow-hidden relative w-full">
+    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-[#1a1d18] via-black to-[#2a2e26] text-[#e6e1d7] font-primary overflow-hidden relative w-full">
       <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
